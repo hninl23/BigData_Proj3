@@ -47,25 +47,11 @@ class BreastCancerDataset:
         y_pred_dt = dt_classifier.predict(self.X_test)
         accuracy_dt = accuracy_score(self.y_test, y_pred_dt)
         conf_matrix_dt = confusion_matrix(self.y_test, y_pred_dt)
-        class_report_dt = classification_report(self.y_test, y_pred_dt, target_names=['Class 0', 'Class 1'],zero_division=0)  # Update target names accordingly
+         
         
         print(f'Training Time: {training_time:.2f} seconds')
         print(f'Accuracy: {accuracy_dt:.2f}')
         print('Confusion Matrix:\n', conf_matrix_dt)
-        print('Classification Report:\n', class_report_dt)
-        
-        # Visualize the confusion matrix
-        plt.figure(figsize=(6,6))
-        plt.matshow(conf_matrix_dt, cmap=plt.cm.Blues, alpha=0.3)
-        for i in range(conf_matrix_dt.shape[0]):
-            for j in range(conf_matrix_dt.shape[1]):
-                plt.text(x=j, y=i, s=conf_matrix_dt[i, j], va='center', ha='center')
-        
-        plt.xlabel('Predicted labels')
-        plt.ylabel('True labels')
-        plt.title('Confusion Matrix for Decision Tree')
-        plt.show()
-
 
     def train_svm(self):  # Task 4: Train and evaluate SVM Classifier
         start_time = time.time()
@@ -78,25 +64,10 @@ class BreastCancerDataset:
         y_pred_svm = svm_classifier.predict(self.X_test)
         accuracy_svm = accuracy_score(self.y_test, y_pred_svm)
         conf_matrix_svm = confusion_matrix(self.y_test, y_pred_svm)
-        class_report_svm = classification_report(self.y_test, y_pred_svm, target_names=['Class 0', 'Class 1'], zero_division=0)  # Update target names accordingly
         
         print(f'Training Time: {training_time:.2f} seconds')
         print(f'Accuracy: {accuracy_svm:.2f}')
         print('Confusion Matrix:\n', conf_matrix_svm)
-        print('Classification Report:\n', class_report_svm)
-        
-        # Visualize the confusion matrix
-        plt.figure(figsize=(6,6))
-        plt.matshow(conf_matrix_svm, cmap=plt.cm.Blues, alpha=0.3)
-        for i in range(conf_matrix_svm.shape[0]):
-            for j in range(conf_matrix_svm.shape[1]):
-                plt.text(x=j, y=i, s=conf_matrix_svm[i, j], va='center', ha='center')
-        
-        plt.xlabel('Predicted labels')
-        plt.ylabel('True labels')
-        plt.title('Confusion Matrix for SVM')
-        plt.show()
-
 
 if __name__ == "__main__":
     file_path = 'breast-cancer.csv'
