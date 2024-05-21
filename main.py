@@ -1,17 +1,22 @@
 # Necessary modules
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, recall_score, confusion_matrix
-from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, recall_score
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import tree
+from sklearn.svm import SVC
 import time
 
 class BreastCancerDataset:
     def __init__(self, file_path):
         self.file_path = file_path
         self.df = None
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
 
     def load_dataset(self):  # Task 1: Reading the file
         self.df = pd.read_csv(self.file_path)
@@ -21,18 +26,69 @@ class BreastCancerDataset:
         self.df = self.df.dropna()
         return self.df
 
-    def split_data(self):  # Task 2: Data cleaning / Preparation
-        X = self.df.drop('diagnosis', axis=1)
-        y = self.df['diagnosis']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        return X_train, X_test, y_train, y_test
+    def split_data(self, target_column):  # Task 2: Data cleaning / Preparation
+        X = self.df.drop(target_column, axis=1)
+        y = self.df[target_column]
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        return self.X_train, self.X_test, self.y_train, self.y_test
+    
+    def train_decision_tree(self):  # Task 3: Train and evaluate Decision Tree Classifier
+        start_time = time.time()
+        dt_classifier = DecisionTreeClassifier(random_state=42)
+        dt_classifier.fit(self.X_train, self.y_train)
+        training_time = time.time() - start_time
+        
+        # Visualize the Decision Tree
+        plt.figure(figsize=(20,10))
+        plot_tree(dt_classifier, filled=True, feature_names=self.X_train.columns, class_names=True)
+        plt.show()
+        
+        # Evaluate the model
+        y_pred_dt = dt_classifier.predict(self.X_test)
+        accuracy_dt = accuracy_score(self.y_test, y_pred_dt)
+        conf_matrix_dt = confusion_matrix(self.y_test, y_pred_dt)
+         
+        
+        print(f'Training Time: {training_time:.2f} seconds')
+        print(f'Accuracy: {accuracy_dt:.2f}')
+        print('Confusion Matrix:\n', conf_matrix_dt)
+
+    def train_svm(self):  # Task 4: Train and evaluate SVM Classifier
+        start_time = time.time()
+        svm_classifier = SVC(kernel='rbf', random_state=42)
+        svm_classifier.fit(self.X_train, self.y_train)
+        training_time = time.time() - start_time
+        
+
+        # Evaluate the model
+        y_pred_svm = svm_classifier.predict(self.X_test)
+        accuracy_svm = accuracy_score(self.y_test, y_pred_svm)
+        conf_matrix_svm = confusion_matrix(self.y_test, y_pred_svm)
+        
+        print(f'Training Time: {training_time:.2f} seconds')
+        print(f'Accuracy: {accuracy_svm:.2f}')
+        print('Confusion Matrix:\n', conf_matrix_svm)
 
 if __name__ == "__main__":
     file_path = 'breast-cancer.csv'
     dataset = BreastCancerDataset(file_path)
     df = dataset.load_dataset()
-    df_clean = dataset.clean_data()
-    X_train, X_test, y_train, y_test = dataset.split_data()
+    print("I am Dataset: \n", df.head)
+    df_clean = dataset.clean_data() #Task 2
+    print("\nCleaned Data: \n", df_clean)
+    target_column = 'diagnosis'
+    X_train, X_test, y_train, y_test = dataset.split_data(target_column) #Task 2
+    print("\nX_train Data: \n", X_train)
+    print("\nX_test Data: \n", X_test )
+    print("\ny_train Data: \n", y_train )
+    print("\ny_test Data: \n", y_test )
+
+    # Task 3: Train and evaluate Decision Tree Classifier
+    dataset.train_decision_tree()
+
+    # Task 4: Train and evaluate SVM Classifier
+    dataset.train_svm()
+
 
     # Task 6: Feature importance using Random Forest
     rfc = RandomForestClassifier(random_state=42)
